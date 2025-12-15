@@ -36,4 +36,9 @@ app.get("/api/leaderboard", async (req, res) => {
   res.json(scores);
 });
 
+app.get('/', (req, res) => {
+  res.json({ status: 'API working' });
+});
+
+
 module.exports = app;
