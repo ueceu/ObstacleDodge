@@ -23,7 +23,7 @@ const scoreSchema = new mongoose.Schema({
 
 const Score = mongoose.model('Score', scoreSchema);
 
-app.post('/submit', async (req, res) => {
+app.post('/api/submit', async (req, res) => {
   try {
     const { name, hits, time } = req.body;
     const penalty = hits * 0.5;
@@ -37,9 +37,9 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-app.get('/leaderboard', async (req, res) => {
+app.get('/api/leaderboard', async (req, res) => {
   try {
-    const scores = await Score.find().sort({ total: -1 }).limit(10);
+    const scores = await Score.find().sort({ total: 1 }).limit(10);
     res.json(scores);
   } catch (err) {
     console.error(err);
