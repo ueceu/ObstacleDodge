@@ -1,21 +1,17 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// TEST ROUTE (çok önemli)
-app.get('/', (req, res) => {
-  res.json({ status: 'API working' });
-});
-
 // Mongo
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('MongoDB connected'))
+  .then(() => console.log("MongoDB connected"))
   .catch(err => console.error(err));
 
+// Schema
 const scoreSchema = new mongoose.Schema({
   username: String,
   hits: Number,
@@ -24,37 +20,41 @@ const scoreSchema = new mongoose.Schema({
   total: Number
 });
 
-const Score = mongoose.model('Score', scoreSchema);
+const Score = mongoose.model("Score", scoreSchema);
+
+// TEST ROUTE (ÇOK ÖNEMLİ)
+app.get("/", (req, res) => {
+  res.json({ status: "API working" });
+});
 
 // SUBMIT
-app.post('/submit', async (req, res) => {
-  try {
-    const { name, hits, time } = req.body;
-    const penalty = hits * 0.5;
-    const total = time + penalty;
+app.post("/submit", async (req, res) => {
+  const { name, hits, time } = req.body;
 
-    await Score.create({
-      username: name,
-      hits,
-      time,
-      penalty,
-      total
-    });
+  const penalty = hits * 0.5;
+  const total = time + penalty;
 
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
+  await Score.create({
+    username: name,
+    hits,
+    time,
+    penalty,
+    total
+  });
+
+  res.json({ ok: true });
 });
 
 // LEADERBOARD
-app.get('/leaderboard', async (req, res) => {
+app.get("/leaderboard", async (req, res) => {
   const scores = await Score.find()
-    .sort({ total: -1 })
+    .sort({ total: 1 })
     .limit(10);
 
   res.json(scores);
 });
 
-
-module.exports = app;
+// 🔥 EN KRİTİK SATIR
+module.exports = (req, res) => {
+  app(req, res);
+};
